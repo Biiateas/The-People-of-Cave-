@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', 'Amiri', serif;
+        }
+
+        .arabic-title {
+            font-family: 'Amiri', serif;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 8px 30px rgba(218, 165, 32, 0.6);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes celebration {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.1) rotate(-3deg);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            75% {
+                transform: scale(1.1) rotate(3deg);
+            }
+        }
+
+        @keyframes sparkle {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .confetti {
+            animation: confettiFall 3s linear forwards;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            transition: all 0.2s ease;
+        }
+
+        .dashed-circle {
+            border-style: dashed;
+            border-width: 2px;
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .celebration-bounce {
+            animation: celebration 0.6s ease-in-out;
+        }
+
+        .shimmer-overlay {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        .drop-zone-hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.5);
+            border-color: #FFD700 !important;
+        }
+
+        .event-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(210, 105, 30, 0.4);
+        }
+
+        .timeline-point {
+            transition: all 0.4s ease;
+        }
+
+        .timeline-point.filled {
+            animation: celebration 0.5s ease-out;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        .success-overlay {
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold arabic-title mb-3"
+                style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #DAA520 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                قصة أصحاب الكهف
+            </h1>
+            <p class="text-amber-800 text-lg mb-6 font-semibold">رتّب الأحداث التالية حسب تسلسلها الزمني</p>
+            <button id="resetBtn"
+                class="text-2xl text-white w-11 h-11 rounded-full font-bold items-center justify-center shadow-md hover:shadow-xl transform hover:scale-110 hover:rotate-180 transition-all duration-500 pulse-glow mb-8"
+                style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: inline-flex;">
+                ⟲
+            </button>
+
+
+            <!-- Decorative Cave Image -->
+            <div class="fixed bottom-4 right-4 z-10 opacity-90 hover:opacity-100 transition-opacity duration-300">
+                <img src="cave-illustration-cartoon-generative-ai-free-png.png" alt="Cave decoration"
+                    class="w-96 h-auto drop-shadow-lg rounded-lg">
+            </div>
+
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-12">
+
+                    <div class="max-w-7xl mx-auto">
+                        <!-- Header -->
+                        <div class="text-center mb-12">
+                            <!-- Success Message -->
+                            <div id="successMessage"
+                                class="hidden fixed inset-0 z-50 flex items-center justify-center success-overlay"
+                                style="background: rgba(255, 248, 220, 0.97);">
+                                <div class="bg-white rounded-3xl shadow-2xl p-10 mb-12 text-center border-4 celebration-bounce relative overflow-hidden"
+                                    style="border-color: #DAA520; max-width: 600px;">
+
+                                    <div class="absolute inset-0 shimmer-overlay pointer-events-none"></div>
+
+                                    <div class="text-4xl mb-4 animate-bounce">👏👏👏</div>
+
+                                    <h2 class="text-3xl font-bold arabic-title mb-2" style="color: #8B4513;">
+                                    </h2>
+                                    <p class="text-amber-800 text-2xl font-semibold">بارك الله فيك ونفع بك</p>
+                                </div>
+                            </div>
+
+                            <!-- Confetti Container -->
+                            <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
+
+                            <!-- Timeline -->
+                            <div class="bg-white rounded-3xl shadow-xl p-16 mb-8"
+                                style="box-shadow: 0 10px 40px rgba(139, 69, 19, 0.15);">
+                                <div class="relative">
+                                    <!-- Timeline line with arrow -->
+                                    <div class="relative flex items-center mb-24">
+                                        <div class="flex-1 h-1 rounded-full relative overflow-hidden"
+                                            style="background: linear-gradient(90deg, #8B4513 0%, #CD853F 50%, #DAA520 100%);">
+                                        </div>
+                                        <div class="w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-12"
+                                            style="border-right-width: 14px; border-right-color: #DAA520;"></div>
+                                    </div>
+
+                                    <!-- Points and circles below -->
+                                    <div id="timeline"
+                                        class="flex justify-between items-start absolute top-0 left-0 right-22 w-full">
+                                        <!-- Will be generated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Available Events to Drag -->
+                            <div class="flex flex-wrap justify-between" id="availableEvents">
+                                <!-- Events will be generated by JavaScript -->
+                            </div>
+                        </div>
+
+
+                        <script>
+                            const events = [
+                                { id: 1, text: "إيمان الفتية في بيئة شركية", order: 0 },
+                                { id: 2, text: "الهروب إلى الكهف", order: 1 },
+                                { id: 3, text: "النوم العميق", order: 2 },
+                                { id: 4, text: "الاستيقاظ ومحاولة الشراء", order: 3 },
+                                { id: 5, text: "انتشار الخبر والمعجزة", order: 4 },
+                                { id: 6, text: "موتهم مرة أخرى", order: 5 },
+                                { id: 7, text: "اختلاف الناس وبناء المسجد", order: 6 }
+                            ];
+
+                            let availableItems = [];
+                            let placedItems = [];
+                            let draggedElement = null;
+
+                            function shuffleArray(array) {
+                                const arr = [...array];
+                                for (let i = arr.length - 1; i > 0; i--) {
+                                    const j = Math.floor(Math.random() * (i + 1));
+                                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                                }
+                                return arr;
+                            }
+
+                            function resetGame() {
+                                availableItems = shuffleArray(events);
+                                placedItems = new Array(events.length).fill(null);
+                                document.getElementById('successMessage').classList.add('hidden');
+                                document.getElementById('confettiContainer').innerHTML = '';
+                                renderTimeline();
+                                renderAvailableEvents();
+                            }
+
+                            function renderTimeline() {
+                                const timeline = document.getElementById('timeline');
+                                timeline.innerHTML = '';
+
+                                placedItems.forEach((item, idx) => {
+                                    const slot = document.createElement('div');
+                                    slot.className = 'flex flex-col items-center';
+                                    slot.style.width = `${100 / events.length}%`;
+
+                                    // Point on timeline - exactly on the line
+                                    const point = document.createElement('div');
+                                    point.className = 'timeline-point w-4 h-4 rounded-full transition-all relative';
+
+                                    if (item) {
+                                        point.classList.add('filled');
+                                        point.style.background = 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)';
+                                        point.style.boxShadow = '0 0 15px rgba(218, 165, 32, 0.6)';
+
+                                        // Add sparkles
+                                        for (let i = 0; i < 4; i++) {
+                                            const sparkle = document.createElement('div');
+                                            sparkle.className = 'sparkle';
+                                            sparkle.style.top = `${Math.random() * 16 - 8}px`;
+                                            sparkle.style.left = `${Math.random() * 16 - 8}px`;
+                                            sparkle.style.animationDelay = `${i * 0.3}s`;
+                                            point.appendChild(sparkle);
+                                        }
+                                    } else {
+                                        point.style.backgroundColor = '#D3D3D3';
+                                        point.style.border = '2px solid #8B4513';
+                                    }
+
+                                    // Circle below point (drop zone) - closer to line
+                                    const dropZone = document.createElement('div');
+                                    dropZone.className = 'w-28 h-14 rounded-xl mt-4 flex items-center justify-center border-2 border-dashed transition-all duration-300 cursor-pointer';
+
+                                    if (item) {
+                                        dropZone.style.background = 'linear-gradient(135deg, #FFF8DC 0%, #FFE4B5 100%)';
+                                        dropZone.style.borderColor = '#DAA520';
+                                        dropZone.style.borderStyle = 'solid';
+                                    } else {
+                                        dropZone.style.backgroundColor = '#F5F5F5';
+                                        dropZone.style.borderColor = '#A9A9A9';
+                                    }
+                                    dropZone.dataset.dropIndex = idx;
+                                    dropZone.addEventListener('dragover', handleDragOver);
+                                    dropZone.addEventListener('drop', handleDrop);
+                                    dropZone.addEventListener('dragenter', (e) => {
+                                        if (!item && draggedElement) {
+                                            dropZone.classList.add('drop-zone-hover');
+                                        }
+                                    });
+                                    dropZone.addEventListener('dragleave', (e) => {
+                                        dropZone.classList.remove('drop-zone-hover');
+                                    });
+
+                                    if (item) {
+                                        dropZone.draggable = true;
+                                        dropZone.dataset.fromTimeline = 'true';
+                                        dropZone.dataset.timelineIndex = idx;
+                                        dropZone.dataset.itemId = item.id;
+                                        dropZone.classList.add('cursor-move', 'hover:scale-105');
+                                        dropZone.addEventListener('dragstart', handleDragStart);
+                                        dropZone.addEventListener('dragend', (e) => {
+                                            e.currentTarget.classList.remove('dragging');
+                                        });
+
+                                        dropZone.innerHTML = `
+                        <div class="text-center px-3">
+                            <div class="text-sm font-bold leading-tight" style="color: #8B4513;">${item.text}</div>
+                        </div>
+                    `;
+                                    }
+
+                                    slot.appendChild(point);
+                                    slot.appendChild(dropZone);
+                                    timeline.appendChild(slot);
+                                });
+                            }
+
+                            function renderAvailableEvents() {
+                                const container = document.getElementById('availableEvents');
+                                container.innerHTML = '';
+
+                                availableItems.forEach(item => {
+                                    const circle = document.createElement('div');
+                                    circle.className = 'event-card w-22 h-12 rounded-xl flex items-center justify-center cursor-move transition-all duration-300';
+                                    circle.style.backgroundColor = '#F5E6D3';
+                                    circle.style.border = '3px solid #D2691E';
+                                    circle.style.boxShadow = '0 4px 12px rgba(210, 105, 30, 0.2)';
+                                    circle.draggable = true;
+                                    circle.dataset.itemId = item.id;
+                                    circle.dataset.fromTimeline = 'false';
+
+                                    circle.innerHTML = `
+                    <div class="text-center px-3">
+                        <div class="text-sm font-bold leading-tight" style="color: #8B4513;">${item.text}</div>
+                    </div>
+                `;
+
+                                    circle.addEventListener('dragstart', handleDragStart);
+                                    circle.addEventListener('dragend', (e) => {
+                                        e.currentTarget.classList.remove('dragging');
+                                    });
+                                    container.appendChild(circle);
+                                });
+
+                                if (availableItems.length === 0) {
+                                    container.innerHTML = '<div class="text-center text-lg py-6 w-full font-semibold" style="color: #8B4513;"></div>';
+                                }
+                            }
+
+                            function handleDragStart(e) {
+                                draggedElement = e.currentTarget;
+                                e.currentTarget.classList.add('dragging');
+                                e.dataTransfer.effectAllowed = 'move';
+                            }
+
+                            function handleDragOver(e) {
+                                e.preventDefault();
+                                e.dataTransfer.dropEffect = 'move';
+                            }
+
+                            function handleDrop(e) {
+                                e.preventDefault();
+                                e.currentTarget.classList.remove('drop-zone-hover');
+
+                                if (!draggedElement) return;
+
+                                const dropTarget = e.currentTarget;
+                                const dropIndex = parseInt(dropTarget.dataset.dropIndex);
+
+                                if (dropIndex === undefined || dropIndex === null) return;
+
+                                const itemId = parseInt(draggedElement.dataset.itemId);
+                                const fromTimeline = draggedElement.dataset.fromTimeline === 'true';
+
+                                const item = fromTimeline
+                                    ? placedItems[parseInt(draggedElement.dataset.timelineIndex)]
+                                    : availableItems.find(i => i.id === itemId);
+
+                                if (!item) return;
+
+                                if (fromTimeline) {
+                                    placedItems[parseInt(draggedElement.dataset.timelineIndex)] = null;
+                                } else {
+                                    availableItems = availableItems.filter(i => i.id !== itemId);
+                                }
+
+                                if (placedItems[dropIndex]) {
+                                    availableItems.push(placedItems[dropIndex]);
+                                }
+
+                                placedItems[dropIndex] = item;
+                                draggedElement.classList.remove('dragging');
+                                draggedElement = null;
+
+                                renderTimeline();
+                                renderAvailableEvents();
+                                checkCompletion();
+                            }
+
+                            function checkCompletion() {
+                                if (placedItems.every(item => item !== null)) {
+                                    const isCorrect = placedItems.every((item, idx) => item.order === idx);
+                                    if (isCorrect) {
+                                        setTimeout(() => showSuccess(), 300);
+                                    }
+                                }
+                            }
+
+                            function showSuccess() {
+                                document.getElementById('successMessage').classList.remove('hidden');
+                                createConfetti();
+                            }
+
+                            function createConfetti() {
+                                const container = document.getElementById('confettiContainer');
+                                container.innerHTML = '';
+
+                                const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3', '#FF1493', '#00CED1', '#FFD700'];
+                                const shapes = ['●', '■', '▲', '★', '♥', '◆'];
+
+                                for (let i = 0; i < 100; i++) {
+                                    const confetti = document.createElement('div');
+                                    confetti.className = 'confetti absolute font-bold';
+                                    confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+                                    confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
+                                    confetti.style.left = Math.random() * 100 + '%';
+                                    confetti.style.fontSize = (Math.random() * 20 + 14) + 'px';
+                                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                                    container.appendChild(confetti);
+                                }
+
+                                setTimeout(() => {
+                                    container.innerHTML = '';
+                                }, 4000);
+                            }
+
+                            document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+                            resetGame();
+                        </script>
+</body>
+
+</html>
