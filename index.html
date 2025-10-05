@@ -157,36 +157,45 @@
         /* Landscape mode optimizations */
         @media (max-height: 500px) and (orientation: landscape) {
             body {
-                padding: 0.5rem;
+                padding: 0.5rem !important;
             }
-
-            .timeline-container {
-                padding: 1rem !important;
-            }
-
-            .header-section {
-                margin-bottom: 1rem !important;
-            }
-
-            h1 {
+            
+            .header-section h1 {
                 font-size: 1.5rem !important;
                 margin-bottom: 0.5rem !important;
             }
-
-            .subtitle {
+            
+            .header-section .subtitle {
                 font-size: 0.875rem !important;
                 margin-bottom: 0.5rem !important;
             }
-
+            
+            .header-section {
+                margin-bottom: 1rem !important;
+            }
+            
+            .timeline-container {
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
             .section-title {
                 font-size: 1rem !important;
                 margin-bottom: 0.75rem !important;
             }
-
+            
             #resetBtn {
                 width: 2.5rem !important;
                 height: 2.5rem !important;
                 font-size: 1.25rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .event-card {
+                height: 3rem !important;
+            }
+            
+            .mb-8 {
                 margin-bottom: 1rem !important;
             }
         }
@@ -196,13 +205,12 @@
 <body class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="text-center mb-8 md:mb-12">
+        <div class="header-section text-center mb-8 md:mb-12">
             <h1 class="text-3xl md:text-5xl font-bold arabic-title mb-3"
                 style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #DAA520 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                 قصة أصحاب الكهف
             </h1>
-            <p class="text-amber-800 text-base md:text-lg mb-4 md:mb-6 font-semibold px-4">رتّب الأحداث التالية حسب
-                تسلسلها الزمني</p>
+            <p class="subtitle text-amber-800 text-base md:text-lg mb-4 md:mb-6 font-semibold px-4">رتّب الأحداث التالية حسب تسلسلها الزمني</p>
             <button id="resetBtn"
                 class="text-xl md:text-2xl text-white w-12 h-12 md:w-14 md:h-14 rounded-full font-bold flex items-center justify-center shadow-md hover:shadow-xl transform hover:scale-110 active:scale-95 hover:rotate-180 transition-all duration-500 pulse-glow mb-6 md:mb-8 mx-auto"
                 style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);">
@@ -210,8 +218,7 @@
             </button>
 
             <!-- Decorative Cave Image - Hidden on mobile -->
-            <div
-                class="hidden md:block fixed bottom-4 right-4 z-10 opacity-90 hover:opacity-100 transition-opacity duration-300">
+            <div class="hidden md:block fixed bottom-4 right-4 z-10 opacity-90 hover:opacity-100 transition-opacity duration-300">
                 <img src="cave-illustration-cartoon-generative-ai-free-png.png" alt="Cave decoration"
                     class="w-64 lg:w-96 h-auto drop-shadow-lg rounded-lg">
             </div>
@@ -231,7 +238,7 @@
                         أحسنت!
                     </h2>
                     <p class="text-amber-800 text-xl md:text-2xl font-semibold">بارك الله فيك ونفع بك</p>
-
+                    
                     <button onclick="document.getElementById('resetBtn').click()"
                         class="mt-6 bg-gradient-to-r from-amber-600 to-amber-800 text-white px-6 py-3 rounded-xl font-bold text-lg transform hover:scale-105 active:scale-95 transition-all shadow-lg">
                         العب مرة أخرى 🔄
@@ -243,9 +250,9 @@
             <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
 
             <!-- Timeline -->
-            <div class="bg-white rounded-2xl md:rounded-3xl shadow-xl p-6 md:p-16 mb-6 md:mb-8"
+            <div class="timeline-container bg-white rounded-2xl md:rounded-3xl shadow-xl p-6 md:p-16 mb-6 md:mb-8"
                 style="box-shadow: 0 10px 40px rgba(139, 69, 19, 0.15);">
-                <h2 class="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-amber-900">
+                <h2 class="section-title text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-amber-900">
                     📜 الخط الزمني
                 </h2>
                 <div class="relative overflow-x-auto">
@@ -259,7 +266,8 @@
                     </div>
 
                     <!-- Points and circles below -->
-                    <div id="timeline" class="flex justify-between items-start absolute top-0 left-4 right-20 min-w-max"
+                    <div id="timeline"
+                        class="flex justify-between items-start absolute top-0 left-4 right-20 min-w-max"
                         style="min-width: 600px;">
                         <!-- Will be generated by JavaScript -->
                     </div>
@@ -268,7 +276,7 @@
 
             <!-- Available Events to Drag -->
             <div class="mb-8">
-                <h2 class="text-xl md:text-2xl font-bold text-center mb-6 text-amber-900">
+                <h2 class="section-title text-xl md:text-2xl font-bold text-center mb-6 text-amber-900">
                     🎴 البطاقات المتاحة
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="availableEvents">
@@ -382,7 +390,7 @@
                         dropZone.addEventListener('dragend', (e) => {
                             e.currentTarget.classList.remove('dragging');
                         });
-
+                        
                         if (isMobile) {
                             dropZone.addEventListener('touchstart', handleTouchStart);
                         }
@@ -414,6 +422,11 @@
                     card.dataset.itemId = item.id;
                     card.dataset.fromTimeline = 'false';
 
+                    // Adjust height for landscape
+                    if (window.innerHeight < 500 && window.matchMedia("(orientation: landscape)").matches) {
+                        card.style.height = '3.5rem';
+                    }
+
                     card.innerHTML = `
                         <div class="text-center px-4">
                             <div class="text-sm md:text-base font-bold leading-tight" style="color: #8B4513;">${item.text}</div>
@@ -424,11 +437,11 @@
                     card.addEventListener('dragend', (e) => {
                         e.currentTarget.classList.remove('dragging');
                     });
-
+                    
                     if (isMobile) {
                         card.addEventListener('touchstart', handleTouchStart);
                     }
-
+                    
                     container.appendChild(card);
                 });
 
@@ -497,7 +510,7 @@
 
             function handleTouchDrop(e) {
                 e.preventDefault();
-
+                
                 if (!touchStartElement) return;
 
                 const dropTarget = e.currentTarget;
